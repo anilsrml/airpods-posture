@@ -1,8 +1,8 @@
 {
     "KPlugin": {
-        "Id": "org.anilsrml.durus",
-        "Name": "Duruş",
-        "Description": "AirPods kafa sensörüyle duruş takibi",
+        "Id": "org.anilsrml.airpodsposture",
+        "Name": "AirPods Posture",
+        "Description": "Posture monitor using the AirPods head-tracking sensor",
         "Icon": "user-available",
         "Category": "System Information",
         "License": "GPL-3.0-or-later",

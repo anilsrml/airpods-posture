@@ -8,7 +8,7 @@ const vm = require("node:vm");
 // logic.js QML'in JS kaynak dosyası; export yok, o yüzden vm ile yüklenir.
 const ctx = {};
 vm.runInNewContext(
-  fs.readFileSync(path.join(__dirname, "../org.anilsrml.durus/contents/ui/logic.js"), "utf8"), ctx);
+  fs.readFileSync(path.join(__dirname, "../org.anilsrml.airpodsposture/contents/ui/logic.js"), "utf8"), ctx);
 
 test("dik duruş yeşil", () => {
   const v = ctx.view({ state: "upright", pitch: 3.2 });

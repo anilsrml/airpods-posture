@@ -2,8 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from durus.config import load_config
-from durus.engine import Config
+from posture.config import load_config
+from posture.engine import Config
 
 
 class LoadConfigTest(unittest.TestCase):

@@ -13,7 +13,7 @@ PlasmoidItem {
     property var status: null
     readonly property var view: Logic.view(status)
 
-    toolTipMainText: "Duruş: " + view.label
+    toolTipMainText: "Posture: " + view.label
     toolTipSubText: view.detail
     Plasmoid.icon: "user-available"
 

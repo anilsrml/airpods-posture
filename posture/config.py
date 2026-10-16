@@ -4,7 +4,7 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from durus.engine import Config
+from posture.engine import Config
 
 DEFAULT_PATH = Path.home() / ".config" / "posture" / "config.toml"
 

@@ -4,8 +4,8 @@ import unittest
 import urllib.error
 import urllib.request
 
-from durus.api import Monitor, make_server
-from durus.engine import PostureEngine
+from posture.api import Monitor, make_server
+from posture.engine import PostureEngine
 from tests.test_engine import UPRIGHT_PITCH, gravity
 
 

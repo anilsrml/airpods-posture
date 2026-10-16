@@ -1,17 +1,17 @@
-"""Servis: python3 -m durus"""
+"""Servis: python3 -m posture"""
 import logging
 import threading
 import time
 
-from durus.api import Monitor, make_server
-from durus.config import load_config
-from durus.engine import PostureEngine
-from durus.notifier import notify
-from durus.sensor import AirPodsLink, find_airpods_mac, is_connected
+from posture.api import Monitor, make_server
+from posture.config import load_config
+from posture.engine import PostureEngine
+from posture.notifier import notify
+from posture.sensor import AirPodsLink, find_airpods_mac, is_connected
 
 RETRY_S = 3
 
-log = logging.getLogger("durus")
+log = logging.getLogger("posture")
 
 
 def main():
@@ -35,14 +35,14 @@ def main():
             with AirPodsLink(mac) as link:
                 monitor.connected()
                 log.info("kafa takibi başladı, kalibrasyon")
-                notify("Kalibrasyon", f"{cfg.engine.zero_window_s:.0f} saniye dik dur.")
+                notify("Calibrating", f"Sit upright for {cfg.engine.zero_window_s:.0f} seconds.")
                 for g in link.gravity():
                     if not monitor.running:
                         log.info("durduruldu")
                         break
                     if monitor.update(g):
                         log.info("bildirim gönderildi")
-                        notify("DİK DUR", f"{seconds:.0f} saniyedir öne eğiksin.")
+                        notify("SIT UP STRAIGHT", f"You have been leaning forward for {seconds:.0f} seconds.")
         except OSError as e:
             log.info("bağlantı bitti: %s", e)
             time.sleep(RETRY_S)

@@ -1,0 +1,13 @@
+[Unit]
+Description=AirPods posture monitor (service for the Plasma panel widget)
+After=bluetooth.target
+
+[Service]
+WorkingDirectory=%h/Desktop/airpods-posture
+ExecStart=/usr/bin/python3 -m posture
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

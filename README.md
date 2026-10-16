@@ -1,8 +1,8 @@
-# airpods-durus
+# airpods-posture
 
 Posture monitor for Linux that uses the motion sensor in your AirPods. A dot in the KDE Plasma panel shows whether you are sitting upright, and a notification tells you to sit up when you slouch.
 
-🟢 upright · 🟡 leaning forward · 🔴 slouching for more than 15 s (shows a "DİK DUR" notification) · ⚪ stopped or not connected
+🟢 upright · 🟡 leaning forward · 🔴 slouching for more than 15 s (shows a "SIT UP STRAIGHT" notification) · ⚪ stopped or not connected
 
 ## How it works
 
@@ -20,13 +20,13 @@ Posture monitor for Linux that uses the motion sensor in your AirPods. A dot in 
 ## Install
 
 ```bash
-cp systemd/airpods-durus.service ~/.config/systemd/user/   # edit WorkingDirectory if needed
+cp systemd/airpods-posture.service ~/.config/systemd/user/   # edit WorkingDirectory if needed
 systemctl --user daemon-reload
-systemctl --user enable --now airpods-durus
-kpackagetool6 --type Plasma/Applet --install widget/org.anilsrml.durus
+systemctl --user enable --now airpods-posture
+kpackagetool6 --type Plasma/Applet --install widget/org.anilsrml.airpodsposture
 ```
 
-Then right-click the panel, select **Add Widgets…** and add **Duruş**.
+Then right-click the panel, select **Add Widgets…** and add **AirPods Posture**.
 
 ## Use
 
@@ -50,7 +50,7 @@ zero_window_s = 3     # calibration time
 ```bash
 python3 -m unittest                  # service tests
 node --test widget/tests/*.test.js   # widget tests
-python3 tools/izle.py                # live state in the terminal
+python3 tools/watch.py                # live state in the terminal
 ```
 
 `spike/` contains the script that was used to explore the protocol, with notes on what was found.

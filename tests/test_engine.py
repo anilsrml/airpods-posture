@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from durus.engine import PostureEngine, State, pitch_from_gravity
+from posture.engine import PostureEngine, State, pitch_from_gravity
 
 UPRIGHT_PITCH = 49.0
 

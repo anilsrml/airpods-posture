@@ -1,6 +1,6 @@
 import unittest
 
-from durus.sensor import parse_gravity
+from posture.sensor import parse_gravity
 
 # AirPods 4'ten yakalanan gerçek paketler (spike, 2026-10-16).
 # Sıra numarası varint olduğu için uzunluk 80 ya da 81 bayt olabiliyor.
