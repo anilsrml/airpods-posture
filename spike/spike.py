@@ -11,7 +11,7 @@ AirPods 4 (firmware 2026-10) bulguları:
   - Yük[20:26] ham ivme (int16 x3, |a|~26000), yük[26:32] jiroskop,
     yük[44:50] yerçekimi birim vektörü x1024 (|g|~1022, mutlak).
   - Öne eğim = atan2(gy, |gx|); gx işareti hangi kulaklığın veri gönderdiğine göre değişir.
-  - Yeniden takma testi (5 takış): dik duruşta öne eğim 44-59° arası (std 4.9°).
+  - Yeniden takma testi (5 takış): dik duruşta öne eğim 44-53° arası (std 3.0°).
     Sonuç: mutlak açıya güvenilmez, her takışta sıfırlama gerekir.
 
 Kullanım:
