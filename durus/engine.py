@@ -1,0 +1,100 @@
+"""Duruş kararı: yerçekimi vektörü + zaman → durum. Donanım ve saat bilmez."""
+import math
+from dataclasses import dataclass
+from enum import Enum
+
+
+def pitch_from_gravity(g):
+    """Öne eğim açısı (derece). gx'in işareti hangi kulaklığın gönderdiğine bağlı, o yüzden mutlak alınır."""
+    return math.degrees(math.atan2(g[1], abs(g[0])))
+
+
+class State(Enum):
+    DISCONNECTED = "disconnected"
+    CALIBRATING = "calibrating"
+    UPRIGHT = "upright"
+    LEANING = "leaning"
+    SLOUCHED = "slouched"
+    PAUSED = "paused"
+
+
+@dataclass(frozen=True)
+class Config:
+    threshold_deg: float = 15.0
+    slouch_after_s: float = 20.0
+    notify_after_s: float = 30.0
+    zero_window_s: float = 3.0
+
+
+class PostureEngine:
+    def __init__(self, config=Config()):
+        self.config = config
+        self.pitch = None
+        self._connected = False
+        self._paused = False
+        self._posture = State.DISCONNECTED
+        self._ref = None
+        self._zero_until = None
+        self._zero_samples = []
+        self._leaning_since = None
+        self._notified = False
+
+    @property
+    def state(self):
+        if self._paused and self._connected:
+            return State.PAUSED
+        return self._posture
+
+    def connected(self, t):
+        self._connected = True
+        self.recalibrate(t)
+
+    def disconnected(self):
+        self._connected = False
+        self._posture = State.DISCONNECTED
+        self._ref = None
+        self.pitch = None
+        self._reset_timers()
+
+    def recalibrate(self, t):
+        """Sonraki zero_window_s saniyedeki duruş yeni sıfır olur."""
+        self._posture = State.CALIBRATING
+        self._zero_until = t + self.config.zero_window_s
+        self._zero_samples = []
+        self._reset_timers()
+
+    def pause(self):
+        self._paused = True
+
+    def resume(self):
+        self._paused = False
+        self._reset_timers()
+
+    def update(self, t, g):
+        """Bir örnek işler. Bildirim gönderilmesi gerekiyorsa True döner."""
+        if self._paused or not self._connected:
+            return False
+        raw = pitch_from_gravity(g)
+        if self._posture == State.CALIBRATING:
+            if t < self._zero_until:
+                self._zero_samples.append(raw)
+                return False
+            zero = self._zero_samples or [raw]
+            self._ref = sum(zero) / len(zero)
+        self.pitch = raw - self._ref
+        if self.pitch < self.config.threshold_deg:
+            self._reset_timers()
+            self._posture = State.UPRIGHT
+            return False
+        if self._leaning_since is None:
+            self._leaning_since = t
+        leaning_for = t - self._leaning_since
+        self._posture = State.SLOUCHED if leaning_for >= self.config.slouch_after_s else State.LEANING
+        if not self._notified and leaning_for >= self.config.slouch_after_s + self.config.notify_after_s:
+            self._notified = True
+            return True
+        return False
+
+    def _reset_timers(self):
+        self._leaning_since = None
+        self._notified = False
