@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Id": "org.anilsrml.durus",
+        "Name": "Duruş",
+        "Description": "AirPods kafa sensörüyle duruş takibi",
+        "Icon": "user-available",
+        "Category": "System Information",
+        "License": "GPL-3.0-or-later",
+        "Version": "0.1",
+        "Authors": [{ "Name": "Anıl Sürmeli" }]
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
