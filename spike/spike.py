@@ -22,13 +22,14 @@ Kullanım:
 """
 import json
 import math
+import os
 import socket
 import struct
 import sys
 import time
 from pathlib import Path
 
-MAC = "AA:BB:CC:DD:EE:FF"
+MAC = os.environ.get("AIRPODS_MAC", "AA:BB:CC:DD:EE:FF")  # bluetoothctl devices
 PSM = 0x1001
 DATA_DIR = Path(__file__).parent / "data"
 
