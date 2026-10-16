@@ -69,20 +69,21 @@ PlasmoidItem {
         }
 
         PlasmaComponents.Button {
+            readonly property bool running: Logic.isRunning(root.status)
             Layout.fillWidth: true
-            icon.name: "view-refresh"
-            text: "Şu an dik duruyorum"
-            enabled: root.status !== null && root.status.state !== "disconnected"
-            onClicked: root.request("POST", "/recalibrate")
+            icon.name: running ? "media-playback-stop" : "media-playback-start"
+            text: running ? "Durdur" : "Başlat (3 sn dik dur)"
+            enabled: root.status !== null
+            onClicked: root.request("POST", running ? "/stop" : "/start")
         }
 
         PlasmaComponents.Button {
-            readonly property bool paused: root.status !== null && root.status.state === "paused"
             Layout.fillWidth: true
-            icon.name: paused ? "media-playback-start" : "media-playback-pause"
-            text: paused ? "Devam et" : "Duraklat"
+            icon.name: "view-refresh"
+            text: "Şu an dik duruyorum"
+            visible: root.status !== null && root.status.state !== "stopped"
             enabled: root.status !== null && root.status.state !== "disconnected"
-            onClicked: root.request("POST", paused ? "/resume" : "/pause")
+            onClicked: root.request("POST", "/recalibrate")
         }
 
         Item { Layout.fillHeight: true }

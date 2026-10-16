@@ -8,7 +8,7 @@ var STATES = {
     slouched: { color: "#e74c3c", label: "Kambur" },
     calibrating: { color: GRAY, label: "Sıfırlanıyor, dik dur" },
     disconnected: { color: GRAY, label: "AirPods bağlı değil" },
-    paused: { color: GRAY, label: "Duraklatıldı" }
+    stopped: { color: GRAY, label: "Durduruldu" }
 };
 
 // s: GET /state yanıtı ya da servis yanıt vermiyorsa null.
@@ -22,4 +22,9 @@ function view(s) {
         detail = "Öne eğim: " + (s.pitch >= 0 ? "+" : "") + s.pitch.toFixed(1) + "°";
     }
     return { color: base.color, label: base.label, detail: detail };
+}
+
+// Takip açık mı (Başlat'a basılmış ve servis ayakta).
+function isRunning(s) {
+    return s !== null && s.state !== "stopped";
 }

@@ -22,7 +22,7 @@ test("her durumun rengi ve etiketi", () => {
     ["slouched", "#e74c3c", "Kambur"],
     ["calibrating", "#95a5a6", "Sıfırlanıyor, dik dur"],
     ["disconnected", "#95a5a6", "AirPods bağlı değil"],
-    ["paused", "#95a5a6", "Duraklatıldı"],
+    ["stopped", "#95a5a6", "Durduruldu"],
   ];
   for (const [state, color, label] of cases) {
     const v = ctx.view({ state, pitch: null });
@@ -41,4 +41,11 @@ test("eğim detayı", () => {
   assert.strictEqual(ctx.view({ state: "leaning", pitch: 17.25 }).detail, "Öne eğim: +17.3°");
   assert.strictEqual(ctx.view({ state: "upright", pitch: -4 }).detail, "Öne eğim: -4.0°");
   assert.strictEqual(ctx.view({ state: "disconnected", pitch: null }).detail, "");
+});
+
+test("çalışıyor mu", () => {
+  assert.strictEqual(ctx.isRunning(null), false);
+  assert.strictEqual(ctx.isRunning({ state: "stopped" }), false);
+  assert.strictEqual(ctx.isRunning({ state: "disconnected" }), true);
+  assert.strictEqual(ctx.isRunning({ state: "upright" }), true);
 });
