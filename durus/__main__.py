@@ -25,7 +25,7 @@ def main():
     threading.Thread(target=server.serve_forever, daemon=True).start()
     log.info("API http://127.0.0.1:%d/state, AirPods %s", cfg.port, mac)
 
-    minutes = (cfg.engine.slouch_after_s + cfg.engine.notify_after_s) / 60
+    seconds = cfg.engine.slouch_after_s + cfg.engine.notify_after_s
     while True:
         if not is_connected(mac):
             time.sleep(RETRY_S)
@@ -37,7 +37,7 @@ def main():
                 for g in link.gravity():
                     if monitor.update(g):
                         log.info("bildirim gönderildi")
-                        notify("Dik otur", f"{minutes:.1f} dakikadır öne eğiksin.")
+                        notify("DİK DUR", f"{seconds:.0f} saniyedir öne eğiksin.")
         except OSError as e:
             log.info("bağlantı bitti: %s", e)
         monitor.disconnected()

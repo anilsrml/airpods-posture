@@ -22,7 +22,7 @@ class State(Enum):
 class Config:
     threshold_deg: float = 15.0
     slouch_after_s: float = 15.0
-    notify_after_s: float = 30.0
+    notify_after_s: float = 0.0
     zero_window_s: float = 3.0
 
 

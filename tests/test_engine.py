@@ -77,6 +77,13 @@ class EngineTest(unittest.TestCase):
         feed(e, 3, 30, UPRIGHT_PITCH - 25)
         self.assertEqual(e.state, State.UPRIGHT)
 
+    def test_notifies_the_moment_it_turns_slouched(self):
+        e = calibrated_engine()
+        slouch_at = 3 + e.config.slouch_after_s
+        self.assertEqual(feed(e, 3, slouch_at, UPRIGHT_PITCH + 20), 0)
+        self.assertEqual(e.update(slouch_at, gravity(UPRIGHT_PITCH + 20)), True)
+        self.assertEqual(e.state, State.SLOUCHED)
+
     def test_notifies_once_after_slouching_for_notify_time(self):
         e = calibrated_engine()
         c = e.config
