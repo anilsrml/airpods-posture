@@ -1,0 +1,13 @@
+[Unit]
+Description=AirPods duruş takibi (panel widget'ının servisi)
+After=bluetooth.target
+
+[Service]
+WorkingDirectory=%h/Desktop/airpods-durus
+ExecStart=/usr/bin/python3 -m durus
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -33,9 +33,9 @@ class ApiTest(unittest.TestCase):
         with urllib.request.urlopen(self.base + "/state") as r:
             return json.load(r)
 
-    def test_state_when_disconnected(self):
+    def test_service_starts_stopped(self):
         state = self.get_state()
-        self.assertEqual(state["state"], "disconnected")
+        self.assertEqual(state["state"], "stopped")
         self.assertIsNone(state["pitch"])
         self.assertEqual(state["threshold_deg"], 15.0)
 
@@ -52,6 +52,7 @@ class ApiTest(unittest.TestCase):
         return notes
 
     def connect_and_calibrate(self):
+        self.post("/start")
         self.monitor.connected()
         self.run_for(3.5, UPRIGHT_PITCH)
 
@@ -62,10 +63,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(state["state"], "leaning")
         self.assertAlmostEqual(state["pitch"], 18.0, places=1)
 
-    def test_pause_and_resume(self):
+    def test_start_waits_for_airpods(self):
+        self.assertEqual(self.post("/start")["state"], "disconnected")
+        self.assertTrue(self.monitor.wait_until_running(timeout=0))
+
+    def test_stop_returns_to_stopped(self):
         self.connect_and_calibrate()
-        self.assertEqual(self.post("/pause")["state"], "paused")
-        self.assertEqual(self.post("/resume")["state"], "upright")
+        state = self.post("/stop")
+        self.assertEqual(state["state"], "stopped")
+        self.assertIsNone(state["pitch"])
+        self.assertFalse(self.monitor.running)
 
     def test_recalibrate_uses_posture_from_now_on(self):
         self.connect_and_calibrate()

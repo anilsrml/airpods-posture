@@ -27,21 +27,26 @@ def main():
 
     seconds = cfg.engine.slouch_after_s + cfg.engine.notify_after_s
     while True:
+        monitor.wait_until_running()
         if not is_connected(mac):
             time.sleep(RETRY_S)
             continue
         try:
             with AirPodsLink(mac) as link:
                 monitor.connected()
-                log.info("kafa takibi başladı, %.0f sn dik dur", cfg.engine.zero_window_s)
+                log.info("kafa takibi başladı, kalibrasyon")
+                notify("Kalibrasyon", f"{cfg.engine.zero_window_s:.0f} saniye dik dur.")
                 for g in link.gravity():
+                    if not monitor.running:
+                        log.info("durduruldu")
+                        break
                     if monitor.update(g):
                         log.info("bildirim gönderildi")
                         notify("DİK DUR", f"{seconds:.0f} saniyedir öne eğiksin.")
         except OSError as e:
             log.info("bağlantı bitti: %s", e)
+            time.sleep(RETRY_S)
         monitor.disconnected()
-        time.sleep(RETRY_S)
 
 
 if __name__ == "__main__":

@@ -15,7 +15,6 @@ class State(Enum):
     UPRIGHT = "upright"
     LEANING = "leaning"
     SLOUCHED = "slouched"
-    PAUSED = "paused"
 
 
 @dataclass(frozen=True)
@@ -31,19 +30,12 @@ class PostureEngine:
         self.config = config
         self.pitch = None
         self._connected = False
-        self._paused = False
-        self._posture = State.DISCONNECTED
+        self.state = State.DISCONNECTED
         self._ref = None
         self._zero_until = None
         self._zero_samples = []
         self._leaning_since = None
         self._notified = False
-
-    @property
-    def state(self):
-        if self._paused and self._connected:
-            return State.PAUSED
-        return self._posture
 
     def connected(self, t):
         self._connected = True
@@ -51,31 +43,26 @@ class PostureEngine:
 
     def disconnected(self):
         self._connected = False
-        self._posture = State.DISCONNECTED
+        self.state = State.DISCONNECTED
         self._ref = None
         self.pitch = None
         self._reset_timers()
 
     def recalibrate(self, t):
         """Sonraki zero_window_s saniyedeki duruş yeni sıfır olur."""
-        self._posture = State.CALIBRATING
+        if not self._connected:
+            return
+        self.state = State.CALIBRATING
         self._zero_until = t + self.config.zero_window_s
         self._zero_samples = []
         self._reset_timers()
 
-    def pause(self):
-        self._paused = True
-
-    def resume(self):
-        self._paused = False
-        self._reset_timers()
-
     def update(self, t, g):
         """Bir örnek işler. Bildirim gönderilmesi gerekiyorsa True döner."""
-        if self._paused or not self._connected:
+        if not self._connected:
             return False
         raw = pitch_from_gravity(g)
-        if self._posture == State.CALIBRATING:
+        if self.state == State.CALIBRATING:
             if t < self._zero_until:
                 self._zero_samples.append(raw)
                 return False
@@ -84,12 +71,12 @@ class PostureEngine:
         self.pitch = raw - self._ref
         if self.pitch < self.config.threshold_deg:
             self._reset_timers()
-            self._posture = State.UPRIGHT
+            self.state = State.UPRIGHT
             return False
         if self._leaning_since is None:
             self._leaning_since = t
         leaning_for = t - self._leaning_since
-        self._posture = State.SLOUCHED if leaning_for >= self.config.slouch_after_s else State.LEANING
+        self.state = State.SLOUCHED if leaning_for >= self.config.slouch_after_s else State.LEANING
         if not self._notified and leaning_for >= self.config.slouch_after_s + self.config.notify_after_s:
             self._notified = True
             return True

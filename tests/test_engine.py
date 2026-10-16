@@ -97,21 +97,6 @@ class EngineTest(unittest.TestCase):
         feed(e, 60, 61, UPRIGHT_PITCH)
         self.assertEqual(feed(e, 61, 120, UPRIGHT_PITCH + 20), 1)
 
-    def test_paused_ignores_samples_and_never_notifies(self):
-        e = calibrated_engine()
-        e.pause()
-        self.assertEqual(feed(e, 3, 120, UPRIGHT_PITCH + 20), 0)
-        self.assertEqual(e.state, State.PAUSED)
-
-    def test_resume_starts_slouch_timer_fresh(self):
-        e = calibrated_engine()
-        feed(e, 3, 3 + e.config.slouch_after_s - 2, UPRIGHT_PITCH + 20)
-        e.pause()
-        feed(e, 18, 30, UPRIGHT_PITCH + 20)
-        e.resume()
-        feed(e, 30, 40, UPRIGHT_PITCH + 20)
-        self.assertEqual(e.state, State.LEANING)
-
     def test_recalibrate_takes_new_zero_from_current_posture(self):
         e = calibrated_engine()
         e.recalibrate(3.0)
@@ -132,18 +117,17 @@ class EngineTest(unittest.TestCase):
         feed(e, 10, 14, UPRIGHT_PITCH + 8)
         self.assertAlmostEqual(e.pitch, 0.0, places=3)
 
-    def test_resume_while_disconnected_stays_disconnected(self):
-        e = PostureEngine()
-        e.pause()
-        e.resume()
-        self.assertEqual(e.state, State.DISCONNECTED)
-
     def test_first_sample_after_zero_window_becomes_zero(self):
         e = PostureEngine()
         e.connected(0.0)
         feed(e, 5, 6, UPRIGHT_PITCH)
         self.assertEqual(e.state, State.UPRIGHT)
         self.assertAlmostEqual(e.pitch, 0.0, places=3)
+
+    def test_recalibrate_while_disconnected_is_ignored(self):
+        e = PostureEngine()
+        e.recalibrate(0.0)
+        self.assertEqual(e.state, State.DISCONNECTED)
 
 
 if __name__ == "__main__":

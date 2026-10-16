@@ -12,6 +12,21 @@ class Monitor:
         self._engine = engine
         self._clock = clock
         self._lock = threading.Lock()
+        self._running = threading.Event()
+
+    @property
+    def running(self):
+        return self._running.is_set()
+
+    def start(self):
+        self._running.set()
+
+    def stop(self):
+        self._running.clear()
+        self.disconnected()
+
+    def wait_until_running(self, timeout=None):
+        return self._running.wait(timeout)
 
     def connected(self):
         with self._lock:
@@ -26,14 +41,6 @@ class Monitor:
         with self._lock:
             return self._engine.update(self._clock(), g)
 
-    def pause(self):
-        with self._lock:
-            self._engine.pause()
-
-    def resume(self):
-        with self._lock:
-            self._engine.resume()
-
     def recalibrate(self):
         with self._lock:
             self._engine.recalibrate(self._clock())
@@ -41,9 +48,10 @@ class Monitor:
     def snapshot(self):
         with self._lock:
             e = self._engine
+            running = self.running
             return {
-                "state": e.state.value,
-                "pitch": None if e.pitch is None else round(e.pitch, 1),
+                "state": e.state.value if running else "stopped",
+                "pitch": None if e.pitch is None or not running else round(e.pitch, 1),
                 "threshold_deg": e.config.threshold_deg,
             }
 
@@ -56,7 +64,7 @@ def make_server(monitor, port):
             self._reply(200, monitor.snapshot())
 
         def do_POST(self):
-            action = {"/pause": monitor.pause, "/resume": monitor.resume,
+            action = {"/start": monitor.start, "/stop": monitor.stop,
                       "/recalibrate": monitor.recalibrate}.get(self.path)
             if action is None:
                 return self._reply(404, {"error": "not found"})
