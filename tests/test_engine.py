@@ -65,10 +65,11 @@ class EngineTest(unittest.TestCase):
 
     def test_sitting_up_resets_slouch_timer(self):
         e = calibrated_engine()
-        feed(e, 3, 18, UPRIGHT_PITCH + 20)
-        feed(e, 18, 19, UPRIGHT_PITCH)
+        almost = e.config.slouch_after_s - 2
+        feed(e, 3, 3 + almost, UPRIGHT_PITCH + 20)
+        feed(e, 3 + almost, 4 + almost, UPRIGHT_PITCH)
         self.assertEqual(e.state, State.UPRIGHT)
-        feed(e, 19, 34, UPRIGHT_PITCH + 20)
+        feed(e, 4 + almost, 4 + 2 * almost, UPRIGHT_PITCH + 20)
         self.assertEqual(e.state, State.LEANING)
 
     def test_leaning_back_counts_as_upright(self):
@@ -78,9 +79,10 @@ class EngineTest(unittest.TestCase):
 
     def test_notifies_once_after_slouching_for_notify_time(self):
         e = calibrated_engine()
-        # 3 sn + 20 sn eğik = kambur (t=23); +30 sn = bildirim (t=53)
-        self.assertEqual(feed(e, 3, 52, UPRIGHT_PITCH + 20), 0)
-        self.assertEqual(feed(e, 52, 120, UPRIGHT_PITCH + 20), 1)
+        c = e.config
+        notify_at = 3 + c.slouch_after_s + c.notify_after_s
+        self.assertEqual(feed(e, 3, notify_at - 1, UPRIGHT_PITCH + 20), 0)
+        self.assertEqual(feed(e, notify_at - 1, 120, UPRIGHT_PITCH + 20), 1)
 
     def test_notifies_again_after_sitting_up_and_slouching_again(self):
         e = calibrated_engine()
@@ -96,7 +98,7 @@ class EngineTest(unittest.TestCase):
 
     def test_resume_starts_slouch_timer_fresh(self):
         e = calibrated_engine()
-        feed(e, 3, 18, UPRIGHT_PITCH + 20)
+        feed(e, 3, 3 + e.config.slouch_after_s - 2, UPRIGHT_PITCH + 20)
         e.pause()
         feed(e, 18, 30, UPRIGHT_PITCH + 20)
         e.resume()

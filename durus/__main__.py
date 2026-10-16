@@ -36,6 +36,7 @@ def main():
                 log.info("kafa takibi başladı, %.0f sn dik dur", cfg.engine.zero_window_s)
                 for g in link.gravity():
                     if monitor.update(g):
+                        log.info("bildirim gönderildi")
                         notify("Dik otur", f"{minutes:.1f} dakikadır öne eğiksin.")
         except OSError as e:
             log.info("bağlantı bitti: %s", e)

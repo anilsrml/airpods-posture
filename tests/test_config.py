@@ -13,6 +13,9 @@ class LoadConfigTest(unittest.TestCase):
         self.assertIsNone(cfg.mac)
         self.assertEqual(cfg.port, 47800)
 
+    def test_default_slouch_time_is_15_seconds(self):
+        self.assertEqual(Config().slouch_after_s, 15.0)
+
     def test_file_overrides_values(self):
         with tempfile.NamedTemporaryFile("w", suffix=".toml", delete=False) as f:
             f.write('mac = "AA:BB:CC:DD:EE:FF"\nthreshold_deg = 12\nslouch_after_s = 30\n')
